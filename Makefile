@@ -1,15 +1,17 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c11 -Iinclude
+CC ?= gcc
+CPPFLAGS ?= -Iinclude
+CFLAGS ?= -Wall -Wextra -Werror -std=c11 -O2 -g
+LDFLAGS ?=
 
-SRC = $(wildcard src/*.c)
+SRC = src/poison.c
 
 all: demo
 
-demo:
-	$(CC) $(CFLAGS) $(SRC) examples/cli_game.c -o demo
+demo: $(SRC) examples/cli_game.c include/poison.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(SRC) examples/cli_game.c -o demo
 
-lib:
-	$(CC) $(CFLAGS) -fPIC -shared $(SRC) -o libpoison.so
+lib: $(SRC) include/poison.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -fPIC -shared $(SRC) -o libpoison.so
 
 compile_commands:
 	bear -- make clean all
@@ -18,4 +20,3 @@ clean:
 	rm -f demo libpoison.so compile_commands.json
 
 .PHONY: all demo lib compile_commands clean
-
